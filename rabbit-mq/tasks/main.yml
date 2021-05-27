@@ -3,12 +3,12 @@
 - name: Download esl-erlang package
   get_url:
     url: https://packages.erlang-solutions.com/erlang/debian/pool/esl-erlang_24.0.1-1~ubuntu~bionic_amd64.deb
-    dest: /data/esl-erlang_24.0-1-1~ubuntu~bionic_amd64.deb
+    dest: /data/esl-erlang_24.0-1-1-ubuntu-bionic_amd64.deb
   tags: common
 
 - name: Install esl-erlang
   apt:
-    deb: /data/esl-erlang_24.0-1-1~ubuntu~bionic_amd64.deb
+    deb: /data/esl-erlang_24.0-1-1-ubuntu-bionic_amd64.deb
   tags: common
 
 - name: Download erlang solutions
@@ -29,7 +29,7 @@
   tags: common
 
 - name: fix unmet dependencies
-  shell: sudo apt-get -f install
+  shell: sudo apt-get -f install -y
   tags: common
 
 - name: Add rabbit repo
@@ -41,10 +41,7 @@
   tags: common
 
 - name: install rabbitmq
-  apt: 
-    name: rabbitmq-server
-    state: present
-    update_cache: yes
+  shell: sudo apt-get install rabbitmq-server -y
   tags: common
 
 - name: enable rabbitmq plugins
@@ -81,8 +78,8 @@
 
 - name: copy erlang cookie from node1 to node2 and node3
   shell: |
-    sudo scp /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-2.westeu.internal:/var/lib/rabbitmq/
-    sudo scp /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-3.westeu.internal:/var/lib/rabbitmq/
+    sudo scp -i /home/kafkauser/azure-eu-environment/keys/rmq_routing /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-2.westeu.internal:/var/lib/rabbitmq/
+    sudo scp -i /home/kafkauser/azure-eu-environment/keys/rmq_routing /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-3.westeu.internal:/var/lib/rabbitmq/
   tags: copy-erlang-cookie
 
 - name: add ha policies

@@ -1,32 +1,31 @@
 ---
-- name: install
+- name: install common packages, rabbitmq and erlang
   hosts: instance-1,instance-2,instance-3
-  roles:
-    - base_setup
-    - rabbit-mq
-  tags:
-    - common
+  tasks:
+    import_tasks:
+      - /base_setup/tasks/main.yml
+      - /rabbit-mq/tasks/main.yml
+  tags: [common]
 
 - name: run copy erlang cookie task
   hosts: instance-1
-  roles:
-    - rabbit-mq
-  tags:
-    - copy-erlang-cookie  
+  tasks:
+    import_tasks:
+      - /rabbit-mq/tasks/main.yml
+  tags: [copy-erlang-cookie]  
 
 - name: run join cluster task
   hosts: instance-2,instance-3
-  roles:
-    - rabbit-mq
-  tags:
-    - join-cluster
+  tasks:
+    import_tasks:
+      - /rabbit-mq/tasks/main.yml
+  tags: [join-cluster]
 
 - name: run user add/remove and add ha policies task
   hosts: instance-1
-  roles:
-    - rabbit-mq
-  tags:
-    - user-add-remove
-    - add-ha-policies
+  tasks:
+    import_tasks:
+      - /rabbit-mq/tasks/main.yml
+  tags: [user-add-remove, add-ha-policies]
 
 
