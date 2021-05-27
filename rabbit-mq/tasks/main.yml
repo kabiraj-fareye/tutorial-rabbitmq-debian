@@ -6,44 +6,54 @@
       name: apt-transport-https
       state: present
       update_cache: yes
+  tags: common
 
 - name: Download esl-erlang package
   get_url:
     url: https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_21.0-1~debian~stretch_amd64.deb
     dest: /data/esl-erlang_21.0-1~debian~stretch_amd64.deb
+  tags: common
 
 - name: Install esl-erlang
   apt:
     deb: /data/esl-erlang_21.0-1~debian~stretch_amd64.deb
+  tags: common
 
 - name: Download erlang solutions
   get_url:
     url: https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
     dest: /data/erlang-solutions_1.0_all.deb
+  tags: common
 
 - name: Install erlang repository
   apt:
     deb: /data/erlang-solutions_1.0_all.deb
+  tags: common
 
 - name: Add an Apt signing key
   apt_key:
     url: https://packages.erlang-solutions.com/debian/erlang_solutions.asc
     state: present
+  tags: common
 
 - name: fix unmet dependencies
   shell: apt-get -f install
+  tags: common
 
 - name: Add rabbit repo
   shell: echo "https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ bionic main" | tee /etc/apt/sources.list.d/rabbitmq.list
+  tags: common
 
 - name: add trusted key
   shell: wget -O- https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey | sudo apt-key add -
+  tags: common
 
 - name: install rabbitmq
   apt: 
     name: rabbitmq-server
     state: present
     update_cache: yes
+  tags: common
 
 - name: enable rabbitmq plugins
   rabbitmq_plugin:
@@ -51,20 +61,43 @@
     state: enabled
   notify:
     - restart rabbitmq
+  tags: common
 
-#- name: add rabbitmq users admin
-#  rabbitmq_user:
-#    user: admin
-#    password: superpassword
-#    vhost: /
-#    tags: administrator
-#    configure_priv: .*
-#    read_priv: .*
-#    write_priv: .*
-#    state: present
-  
-# If it's not necessary use rabbitmq_exporter uncoment 
-# - name: remove default guest user
-#   rabbitmq_user: 
-#     user: guest
-#     state: absent
+- name: add rabbitmq user admin and delete guest user
+  rabbitmq_user:
+    user: admin
+    password: superpassword
+    vhost: /
+    tags: administrator
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present
+  rabbitmq_user: 
+    user: guest
+    state: absent
+  tags: user-add-remove
+
+- name: join cluster node2 and node3 to node1
+  shell: |
+    sudo systemctl restart rabbitmq-server
+    sudo rabbitmqctl stop_app
+    sudo rabbitmqctl join_cluster rmquser@rmq-1.westeu.internal
+    sudo rabbitmqctl start_app
+    sudo rabbitmqctl cluster_status
+  tags: join-cluster
+
+- name: copy erlang cookie from node1 to node2 and node3
+  shell: |
+    scp /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-2.westeu.internal:/var/lib/rabbitmq/
+    scp /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-3.westeu.internal:/var/lib/rabbitmq/
+  tags: copy-erlang-cookie
+
+- name: add ha policies
+  shell: |
+    sudo rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
+    sudo rabbitmqctl set_policy ha-two "^two\." '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
+    sudo rabbitmqctl set_policy ha-nodes "^nodes\." '{"ha-mode":"nodes","ha-params":["rmquser@rmq-2.westeu.internal", "rmquser@rmq-3.westeu.internal"]}'
+    sudo rabbitmqctl list_policies;
+  tags: add-ha-policies
+

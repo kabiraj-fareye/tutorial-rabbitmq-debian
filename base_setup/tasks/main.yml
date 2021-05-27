@@ -12,3 +12,4 @@
         - htop
         #- software-properties-common
         - bzip2
+      tags: common
