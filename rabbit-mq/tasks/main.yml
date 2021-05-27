@@ -1,43 +1,35 @@
 ---
 # tasks file for rabbitmq setup
-
-- name: Install nessesary package
-  apt: 
-      name: apt-transport-https
-      state: present
-      update_cache: yes
-  tags: common
-
 - name: Download esl-erlang package
   get_url:
-    url: https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_21.0-1~debian~stretch_amd64.deb
-    dest: /data/esl-erlang_21.0-1~debian~stretch_amd64.deb
+    url: https://packages.erlang-solutions.com/erlang/debian/pool/esl-erlang_24.0.1-1~ubuntu~bionic_amd64.deb
+    dest: /data/esl-erlang_24.0-1-1~ubuntu~bionic_amd64.deb
   tags: common
 
 - name: Install esl-erlang
   apt:
-    deb: /data/esl-erlang_21.0-1~debian~stretch_amd64.deb
+    deb: /data/esl-erlang_24.0-1-1~ubuntu~bionic_amd64.deb
   tags: common
 
 - name: Download erlang solutions
   get_url:
-    url: https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
-    dest: /data/erlang-solutions_1.0_all.deb
+    url: https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
+    dest: /data/erlang-solutions_2.0_all.deb
   tags: common
 
 - name: Install erlang repository
   apt:
-    deb: /data/erlang-solutions_1.0_all.deb
+    deb: /data/erlang-solutions_2.0_all.deb
   tags: common
 
 - name: Add an Apt signing key
   apt_key:
-    url: https://packages.erlang-solutions.com/debian/erlang_solutions.asc
+    url: https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
     state: present
   tags: common
 
 - name: fix unmet dependencies
-  shell: apt-get -f install
+  shell: sudo apt-get -f install
   tags: common
 
 - name: Add rabbit repo
@@ -65,8 +57,8 @@
 
 - name: add rabbitmq user admin and delete guest user
   rabbitmq_user:
-    user: admin
-    password: superpassword
+    user: hakase
+    password: aqwe123@
     vhost: /
     tags: administrator
     configure_priv: .*
@@ -89,8 +81,8 @@
 
 - name: copy erlang cookie from node1 to node2 and node3
   shell: |
-    scp /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-2.westeu.internal:/var/lib/rabbitmq/
-    scp /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-3.westeu.internal:/var/lib/rabbitmq/
+    sudo scp /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-2.westeu.internal:/var/lib/rabbitmq/
+    sudo scp /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-3.westeu.internal:/var/lib/rabbitmq/
   tags: copy-erlang-cookie
 
 - name: add ha policies

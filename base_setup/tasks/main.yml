@@ -1,15 +1,7 @@
 ---
 # tasks file for base_setup
     - name: Base setup
-      apt: 
-        name: "{{ item }}"
-        state: present
-        update_cache: yes
-      with_items:
-        - apt-transport-https
-        - curl
-        - telnet 
-        - htop
-        #- software-properties-common
-        - bzip2
+      shell: |
+        sudo apt-get update -y
+        sudo apt-get install apt-transport-https curl telnet htop bzip2 -y
       tags: common
