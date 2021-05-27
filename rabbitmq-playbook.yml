@@ -1,33 +1,23 @@
 ---
 - name: install common packages, rabbitmq and erlang
   hosts: instance-1,instance-2,instance-3
-  tasks:
-    - name: install common packages, rabbitmq and erlang
-      include_tasks: "{{ item }}"
-      loop:
-        - ./base_setup/tasks/main.yml
-        - ./rabbit-mq/tasks/main.yml
-  tags: [ common ]
+  roles:
+    - base-setup
+    - common-package
 
 - name: run copy erlang cookie task
   hosts: instance-1
-  tasks:
-    - name: run copy erlang cookie task
-      import_tasks: ./rabbit-mq/tasks/main.yml
-  tags: [ copy-erlang-cookie ]  
+  roles:
+    - erlang-cookie 
 
 - name: run join cluster task
   hosts: instance-2,instance-3
-  tasks:
-    - name: run join cluster task
-      import_tasks: ./rabbit-mq/tasks/main.yml
-  tags: [ join-cluster ]
+  roles:
+    - join-cluster
 
 - name: run user add/remove and add ha policies task
   hosts: instance-1
-  tasks:
-    - name: run user add/remove and add ha policies task
-      import_tasks: ./rabbit-mq/tasks/main.yml
-  tags: [ user-add-remove, add-ha-policies ]
+  roles:
+    - user-add-ha-policies
 
 

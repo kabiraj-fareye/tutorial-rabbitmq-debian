@@ -1,0 +1,9 @@
+---
+- name: join cluster node2 and node3 to node1
+  shell: |
+    sudo systemctl restart rabbitmq-server
+    sudo rabbitmqctl stop_app
+    sudo rabbitmqctl join_cluster rabbit@eu-fareye-vm-rmq-1
+    sudo rabbitmqctl start_app
+    sudo rabbitmqctl cluster_status
+  tags: join-cluster

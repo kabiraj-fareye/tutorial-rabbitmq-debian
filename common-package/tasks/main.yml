@@ -1,0 +1,54 @@
+---
+- name: Download esl-erlang package
+  get_url:
+    url: https://packages.erlang-solutions.com/erlang/debian/pool/esl-erlang_24.0.1-1~ubuntu~bionic_amd64.deb
+    dest: /data/esl-erlang_24.0-1-1-ubuntu-bionic_amd64.deb
+  tags: common
+
+- name: Install esl-erlang
+  apt:
+    deb: /data/esl-erlang_24.0-1-1-ubuntu-bionic_amd64.deb
+  tags: common
+
+- name: Download erlang solutions
+  get_url:
+    url: https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
+    dest: /data/erlang-solutions_2.0_all.deb
+  tags: common
+
+- name: Install erlang repository
+  apt:
+    deb: /data/erlang-solutions_2.0_all.deb
+  tags: common
+
+- name: Add an Apt signing key
+  apt_key:
+    url: https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
+    state: present
+  tags: common
+
+- name: fix unmet dependencies
+  shell: sudo apt-get -f install -y
+  tags: common
+
+- name: Add rabbit repo
+  shell: echo "deb https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ bionic main" | tee /etc/apt/sources.list.d/rabbitmq.list
+  tags: common
+
+- name: add trusted key
+  shell: wget -O- https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey | sudo apt-key add -
+  tags: common
+
+- name: install rabbitmq
+  shell: |
+    sudo apt-get install rabbitmq-server -y
+    sudo systemctl start rabbitmq-server
+    sudo systemctl enable rabbitmq-server
+  tags: common
+
+- name: enable rabbitmq plugins
+  shell: |
+    sudo rabbitmq-plugins enable rabbitmq_management
+    sudo systemctl restart rabbitmq-server
+  tags: common
+

@@ -1,0 +1,6 @@
+---
+- name: copy erlang cookie from node1 to node2 and node3
+  shell: |
+    sudo scp -i /home/kafkauser/azure-eu-environment/keys/rmq_routing /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-2.westeu.internal:/var/lib/rabbitmq/
+    sudo scp -i /home/kafkauser/azure-eu-environment/keys/rmq_routing /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-3.westeu.internal:/var/lib/rabbitmq/
+  tags: copy-erlang-cookie

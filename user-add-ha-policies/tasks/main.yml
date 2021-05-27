@@ -1,0 +1,23 @@
+---
+- name: add rabbitmq user admin and delete guest user
+  rabbitmq_user:
+    user: hakase
+    password: aqwe123@
+    vhost: /
+    tags: administrator
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present
+  rabbitmq_user: 
+    user: guest
+    state: absent
+  tags: user-add-remove
+  
+- name: add ha policies
+  shell: |
+    sudo rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
+    sudo rabbitmqctl set_policy ha-two "^two\." '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
+    sudo rabbitmqctl set_policy ha-nodes "^nodes\." '{"ha-mode":"nodes","ha-params":["rabbit@eu-fareye-vm-rmq-2", "rabbit@eu-fareye-vm-rmq-3"]}'
+    sudo rabbitmqctl list_policies;
+  tags: add-ha-policies
