@@ -1,6 +1,8 @@
 ---
 - name: join cluster node2 and node3 to node1
   shell: |
+    sudo mv .erlang.cookie /var/lib/rabbitmq/.erlang.cookie
+    sudo chown rabbitmq:rabbitmq /var/lib/rabbitmq/.erlang.cookie
     sudo systemctl restart rabbitmq-server
     sudo rabbitmqctl stop_app
     sudo rabbitmqctl join_cluster rabbit@eu-fareye-vm-rmq-1

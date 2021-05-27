@@ -2,9 +2,9 @@
 
 ansible_ssh_private_key_file=/home/kafkauser/azure-eu-environment/keys/rmq_routing 
 
-[instance-1]
+[instance1]
 rmq-1.westeu.internal  ansible_user=rmquser  ansible_python_interpreter="/usr/bin/env python3"
-[instance-2]
+[instance2]
 rmq-2.westeu.internal  ansible_user=rmquser  ansible_python_interpreter="/usr/bin/env python3"
-[instance-3]
+[instance3]
 rmq-3.westeu.internal  ansible_user=rmquser  ansible_python_interpreter="/usr/bin/env python3"
