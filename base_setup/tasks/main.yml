@@ -7,19 +7,8 @@
         update_cache: yes
       with_items:
         - apt-transport-https
-        - vim
         - curl
-        - whois
         - telnet 
-        - smartmontools
         - htop
-        - bash-completion 
-        - git
-        - strace
-        - screen
-        - ntpdate 
-        - software-properties-common
+        #- software-properties-common
         - bzip2
-        - net-tools
-        - sudo
-        - ntp

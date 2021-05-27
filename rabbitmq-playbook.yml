@@ -1,8 +1,46 @@
 ---
 - name: install
-  hosts: instances
-
+  hosts: instance-1,instance-2,instance-3
   roles:
     - base_setup
-    - rabbit-mq 
-  
+    - rabbit-mq
+
+- name: copy erlang cookie from node1 to node2 and node3
+  hosts: instance-1
+  shell: |
+    scp /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-2.westeu.internal:/var/lib/rabbitmq/
+    scp /var/lib/rabbitmq/.erlang.cookie rmquser@rmq-3.westeu.internal:/var/lib/rabbitmq/
+
+- name: copy erlang cookie from node1 to node2 and node3
+  hosts: instance-2,instance-3
+  shell: |
+    sudo systemctl restart rabbitmq-server
+    sudo rabbitmqctl stop_app
+    sudo rabbitmqctl join_cluster rmquser@rmq-1.westeu.internal
+    sudo rabbitmqctl start_app
+    sudo rabbitmqctl cluster_status
+
+- name: add rabbitmq user and delete user guest
+  hosts: instance-1
+  rabbitmq_user:
+    user: hakase
+    password: aqwe123@
+    vhost: /
+    tags: administrator
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present
+  shell: |
+    sudo rabbitmqctl delete_user guest
+    sudo rabbitmqctl list_users
+
+- name: add ha policies
+  hosts: instance-1
+  shell: |
+    sudo rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
+    sudo rabbitmqctl set_policy ha-two "^two\." '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
+    sudo rabbitmqctl set_policy ha-nodes "^nodes\." '{"ha-mode":"nodes","ha-params":["rmquser@rmq-2.westeu.internal", "rmquser@rmq-3.westeu.internal"]}'
+    sudo rabbitmqctl list_policies;
+
+

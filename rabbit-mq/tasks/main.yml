@@ -10,26 +10,20 @@
 - name: Download esl-erlang package
   get_url:
     url: https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_21.0-1~debian~stretch_amd64.deb
-    dest: /home/admin/esl-erlang_21.0-1~debian~stretch_amd64.deb
-    owner: admin
-    group: admin
-    mode: 0755
+    dest: /data/esl-erlang_21.0-1~debian~stretch_amd64.deb
 
 - name: Install esl-erlang
   apt:
-    deb: /home/admin/esl-erlang_21.0-1~debian~stretch_amd64.deb
+    deb: /data/esl-erlang_21.0-1~debian~stretch_amd64.deb
 
 - name: Download erlang solutions
   get_url:
     url: https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
-    dest: /home/admin/erlang-solutions_1.0_all.deb
-    owner: admin
-    group: admin
-    mode: 0755
+    dest: /data/erlang-solutions_1.0_all.deb
 
 - name: Install erlang repository
   apt:
-    deb: /home/admin/erlang-solutions_1.0_all.deb
+    deb: /data/erlang-solutions_1.0_all.deb
 
 - name: Add an Apt signing key
   apt_key:
@@ -40,10 +34,10 @@
   shell: apt-get -f install
 
 - name: Add rabbit repo
-  shell: echo "deb https://dl.bintray.com/rabbitmq/debian stretch main" | tee /etc/apt/sources.list.d/bintray.rabbitmq.list
+  shell: echo "https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ bionic main" | tee /etc/apt/sources.list.d/rabbitmq.list
 
 - name: add trusted key
-  shell: wget -O- https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc | apt-key add -
+  shell: wget -O- https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey | sudo apt-key add -
 
 - name: install rabbitmq
   apt: 
@@ -58,16 +52,16 @@
   notify:
     - restart rabbitmq
 
-- name: add rabbitmq users admin
-  rabbitmq_user:
-    user: admin
-    password: superpassword
-    vhost: /
-    tags: administrator
-    configure_priv: .*
-    read_priv: .*
-    write_priv: .*
-    state: present
+#- name: add rabbitmq users admin
+#  rabbitmq_user:
+#    user: admin
+#    password: superpassword
+#    vhost: /
+#    tags: administrator
+#    configure_priv: .*
+#    read_priv: .*
+#    write_priv: .*
+#    state: present
   
 # If it's not necessary use rabbitmq_exporter uncoment 
 # - name: remove default guest user
